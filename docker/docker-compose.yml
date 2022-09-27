@@ -7,6 +7,20 @@
 version: "3.8"
 
 services:
+
+  git-checkout:
+    image: bitnami/git:latest
+    working_dir: /temp
+    command: >
+      bash -c "
+        find /temp -mindepth 1 -delete && 
+        find /files -mindepth 1 -delete &&
+        git clone git@github.com:ezzaouia/supabase.git &&
+        cp -R ./supabase/docker/volumes/api/. /kong_config
+      "
+    volumes:
+      - kong_config:/kong_config
+
   studio:
     container_name: supabase-studio
     image: supabase/studio:latest
@@ -36,7 +50,7 @@ services:
       KONG_DNS_ORDER: LAST,A,CNAME
       KONG_PLUGINS: request-transformer,cors,key-auth,acl
     volumes:
-      - ./volumes/api:/var/lib/kong
+      - kong_config:/var/lib/kong
 
   auth:
     container_name: supabase-auth
@@ -152,6 +166,9 @@ services:
       PG_META_DB_NAME: ${POSTGRES_DB}
       PG_META_DB_USER: ${POSTGRES_USER}
       PG_META_DB_PASSWORD: ${POSTGRES_PASSWORD}
+
+volumes:
+  kong_config:
 
   # Comment out everything below this point if you are using an external Postgres database
   #db:
