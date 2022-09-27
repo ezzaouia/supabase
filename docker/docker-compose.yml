@@ -151,7 +151,7 @@ services:
       REGION: stub
       GLOBAL_S3_BUCKET: stub
     volumes:
-      - ./volumes/storage:/var/lib/storage
+      - supabase_storage:/var/lib/storage
 
   meta:
     container_name: supabase-meta
@@ -169,6 +169,7 @@ services:
 
 volumes:
   kong_config:
+  supabase_storage:
 
   # Comment out everything below this point if you are using an external Postgres database
   #db:
