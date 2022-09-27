@@ -7,7 +7,19 @@
 version: "3.8"
 
 services:
-  # Comment out everything below this point if you are using an external Postgres database
+  git-checkout:
+    image: bitnami/git:latest
+    working_dir: /temp
+    command: >
+      bash -c "
+        find /temp -mindepth 1 -delete && 
+        find /files -mindepth 1 -delete &&
+        git clone git@github.com:ezzaouia/supabase.git &&
+        cp -R ./supabase/docker/db/init/. /db_config
+      "
+    volumes:
+      - db_config:/db_config
+
   db:
     container_name: supabase-db
     image: supabase/postgres:14.1.0.21
@@ -19,7 +31,8 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./volumes/db/init:/docker-entrypoint-initdb.d
+      - db_config:/docker-entrypoint-initdb.d
 
 volumes:
   postgres_data:
+  db_config:
